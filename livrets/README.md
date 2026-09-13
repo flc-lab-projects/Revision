@@ -38,7 +38,7 @@ Note that Entraînement still offers all twelve livrets — only the test pool i
 
 Drop the `livrets` folder into the repository root:
 
-    https://flc-lab-projects.github.io/Charly-7P/livrets/
+    https://flc-lab-projects.github.io/Revision/livrets/
 
 Open in Safari, then Share → Add to Home Screen.
 
