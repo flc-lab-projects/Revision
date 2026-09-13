@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="fr-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Phrases">
+<meta name="theme-color" content="#FAE6D6">
+<link rel="apple-touch-icon" href="icon.png">
+<title>Les phrases</title>
+<style>
+  :root{
+    --paper:#FAE6D6;
+    --ink:#2A2136;
+    --muted:#7A6A72;
+    --white:#FFFDFA;
+    --star:#FFC531;
+    --good:#17A34A;
+    --goodbg:#E4F7EA;
+    --bad:#E5484D;
+    --accent:#B03A5B;
+    --line:2.5px solid var(--ink);
+  }
+  .tD {--accent:#3457D5;}   /* déclarative */
+  .tIN{--accent:#6D3FD1;}   /* interrogative */
+  .tIM{--accent:#C2620E;}   /* impérative */
+  .tE {--accent:#C92E76;}   /* exclamative */
+  .tP {--accent:#12864F;}   /* positive */
+  .tN {--accent:#0E7C88;}   /* négative */
+
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;background:var(--paper);}
+  body{font-family:"Avenir Next","Avenir",system-ui,-apple-system,sans-serif;color:var(--ink);
+    padding:max(12px,env(safe-area-inset-top)) 14px calc(24px + env(safe-area-inset-bottom));
+    -webkit-text-size-adjust:100%;}
+  .display{font-family:"Futura","Avenir Next Demi Bold","Avenir Next",system-ui,sans-serif;}
+  button{font:inherit;color:inherit;cursor:pointer;}
+  [hidden]{display:none !important;}
+  :focus-visible{outline:3px solid var(--accent);outline-offset:3px;}
+  .press{transition:transform .06s ease, box-shadow .06s ease;}
+  .press:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink) !important;}
+
+  h1{font-size:30px;font-weight:700;letter-spacing:-.02em;margin:8px 2px 4px;line-height:1;}
+  .sub{margin:0 2px 18px;font-size:13px;color:var(--muted);}
+  .lead{margin:0 2px 14px;font-size:14.5px;color:var(--muted);line-height:1.45;}
+
+  .menu{display:grid;gap:11px;list-style:none;padding:0;margin:0;}
+  .item{width:100%;display:flex;align-items:center;gap:13px;text-align:left;background:var(--white);
+    border:var(--line);border-radius:20px;box-shadow:5px 5px 0 var(--accent);padding:15px 15px 15px 13px;}
+  .badge{flex:none;width:44px;height:44px;border-radius:13px;background:var(--accent);color:#fff;
+    display:grid;place-items:center;font-size:19px;font-weight:700;border:var(--line);}
+  .item .txt{flex:1;min-width:0;}
+  .item .txt b{display:block;font-size:17px;font-weight:600;}
+  .item .txt small{display:block;font-size:13px;color:var(--muted);margin-top:3px;}
+  .item .go{flex:none;font-size:19px;color:var(--muted);}
+
+  .topbar{display:flex;align-items:center;gap:9px;margin:4px 0 14px;}
+  .icon{flex:none;min-width:42px;height:42px;padding:0 10px;border:var(--line);border-radius:13px;
+    background:var(--white);box-shadow:3px 3px 0 var(--ink);display:grid;place-items:center;
+    font-size:18px;font-weight:700;}
+  .track{flex:1;height:12px;border:var(--line);border-radius:999px;background:var(--white);overflow:hidden;}
+  .fill{display:block;height:100%;width:0;background:var(--good);transition:width .3s ease;}
+  .pill{border:var(--line);border-radius:999px;background:var(--star);padding:4px 11px;
+    font-size:13px;font-weight:700;white-space:nowrap;}
+
+  .stage{background:var(--white);border:var(--line);border-radius:24px;box-shadow:6px 6px 0 var(--accent);
+    padding:22px 18px;margin:0 0 14px;}
+  .stage.right{background:var(--goodbg);box-shadow:6px 6px 0 var(--good);}
+  .stage.wrong{box-shadow:6px 6px 0 var(--bad);}
+  .phrase{font-size:22px;font-weight:600;line-height:1.35;margin:0;text-align:center;}
+  .hintline{margin:14px 0 0;font-size:14.5px;font-weight:600;line-height:1.45;min-height:20px;text-align:center;}
+  .hintline.ok{color:var(--good);}
+  .hintline.no{color:var(--bad);}
+
+  .choices{display:grid;gap:10px;}
+  .choices.two{grid-template-columns:1fr 1fr;}
+  .choice{border:var(--line);border-radius:16px;background:var(--white);box-shadow:4px 4px 0 var(--ink);
+    padding:14px 12px;font-size:16px;font-weight:700;display:flex;align-items:center;gap:10px;
+    justify-content:center;text-align:center;}
+  .choice .k{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;
+    border:2px solid var(--ink);background:var(--accent);color:#fff;font-size:13px;flex:none;}
+  .choice.pick{background:var(--accent);color:#fff;}
+  .choice.pick .k{background:var(--white);color:var(--ink);}
+  .choice.sol{background:var(--good);color:#fff;border-color:var(--good);}
+  .choice.err{background:var(--bad);color:#fff;border-color:var(--bad);}
+
+  .answer{width:100%;font:inherit;font-size:17px;font-weight:600;color:var(--ink);background:var(--paper);
+    border:var(--line);border-radius:14px;padding:12px 13px;margin:14px 0 0;}
+  .answer:focus{outline:none;border-color:var(--accent);}
+  .model{margin:12px 0 0;font-size:15px;font-weight:600;line-height:1.45;}
+  .model b{display:block;font-size:12.5px;color:var(--muted);text-transform:uppercase;
+    letter-spacing:.05em;margin-bottom:4px;font-weight:700;}
+  .row{display:flex;gap:10px;}
+  .btn{flex:1;border:var(--line);border-radius:16px;background:var(--white);padding:13px;
+    font-size:15.5px;font-weight:700;box-shadow:4px 4px 0 var(--ink);}
+  .btn.go{background:var(--star);}
+  .btn.soft{background:transparent;box-shadow:none;border-style:dashed;font-weight:600;color:var(--muted);}
+
+  /* théorie */
+  .card{background:var(--white);border:var(--line);border-radius:20px;box-shadow:5px 5px 0 var(--accent);
+    padding:16px 17px;margin:0 0 12px;}
+  .card h3{margin:0 0 8px;font-size:18px;font-weight:700;}
+  .card ul{margin:0;padding-left:18px;font-size:15px;line-height:1.5;}
+  .card .ex{margin:10px 0 0;font-size:15px;font-style:italic;color:var(--accent);font-weight:600;}
+  table.neg{width:100%;border-collapse:collapse;font-size:15px;}
+  table.neg td{border-top:1.5px solid rgba(42,33,54,.15);padding:7px 4px;}
+  table.neg td:first-child{font-weight:700;white-space:nowrap;padding-right:12px;}
+
+  .party{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:24px;
+    background:rgba(42,33,54,.45);}
+  .party .box{background:var(--white);border:3px solid var(--ink);border-radius:26px;
+    box-shadow:8px 8px 0 var(--star);padding:24px 22px 20px;text-align:center;max-width:330px;}
+  .party h3{font-size:25px;margin:8px 0 6px;font-weight:700;}
+  .party p{margin:0 0 18px;font-size:15px;color:var(--muted);line-height:1.45;}
+  footer{margin:22px 2px 0;font-size:12.5px;color:var(--muted);line-height:1.5;}
+  @media (prefers-reduced-motion:reduce){ .fill{transition:none;} .press{transition:none;} }
+</style>
+</head>
+<body>
+
+<!-- ======================= HOME ======================= -->
+<main id="home">
+  <h1 class="display">Les phrases</h1>
+  <p class="sub">Grammaire 7P &middot; types et formes de phrases</p>
+  <ul class="menu" id="menu"></ul>
+  <footer>Chaque phrase revient tant qu&rsquo;elle n&rsquo;est pas juste.</footer>
+</main>
+
+<!-- ======================= THEORY ======================= -->
+<main id="theory" hidden>
+  <div class="topbar">
+    <button class="icon press" id="thBack" aria-label="Retour">&#8592;</button>
+    <h1 class="display" style="font-size:22px;margin:0;">La th&eacute;orie</h1>
+  </div>
+  <div id="theoryBody"></div>
+</main>
+
+<!-- ======================= EXERCISE ======================= -->
+<main id="quiz" hidden>
+  <div class="topbar">
+    <button class="icon press" id="qBack" aria-label="Retour">&#8592;</button>
+    <span class="track"><i class="fill" id="qFill"></i></span>
+    <span class="pill" id="qLeft">0</span>
+    <button class="icon press" id="qAgain" aria-label="Recommencer">&#8635;</button>
+  </div>
+  <div class="stage" id="qStage">
+    <p class="phrase" id="qPhrase">&nbsp;</p>
+    <textarea class="answer" id="qAnswer" rows="2" hidden autocomplete="off"
+      autocorrect="off" autocapitalize="sentences" spellcheck="false"></textarea>
+    <p class="hintline" id="qHint">&nbsp;</p>
+    <div class="model" id="qModel" hidden></div>
+  </div>
+  <div class="choices" id="qChoices"></div>
+  <div class="row" id="qWriteRow" hidden style="margin-top:2px;">
+    <button class="btn go press" id="qCheck">V&eacute;rifier</button>
+  </div>
+  <div class="row" id="qAfterRow" hidden style="margin-top:10px;">
+    <button class="btn soft press" id="qAccept">C&rsquo;&eacute;tait juste aussi</button>
+    <button class="btn go press" id="qNext">Suivant</button>
+  </div>
+</main>
+
+<div class="party" id="party" hidden>
+  <div class="box">
+    <div style="font-size:38px;letter-spacing:4px;">&#11088;&#127881;&#11088;</div>
+    <h3 class="display">Bravo&#8239;!</h3>
+    <p id="partyText"></p>
+    <div class="row">
+      <button class="btn press" id="pAgain">Encore</button>
+      <button class="btn go press" id="pHome">Retour</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* =====================================================================
+   CONTENU — tout ce qui se modifie au fil de l'année est ici.
+   Types : D = déclarative, IN = interrogative, IM = impérative, E = exclamative
+   ===================================================================== */
+
+const TYPES = {
+  D:  {nom:"D\u00e9clarative",   court:"D",  regle:"On donne une information. Elle se termine par un point."},
+  IN: {nom:"Interrogative",      court:"IN", regle:"On pose une question. Elle se termine par un point d\u2019interrogation."},
+  IM: {nom:"Imp\u00e9rative",    court:"IM", regle:"On donne un ordre ou un conseil. Le verbe est \u00e0 l\u2019imp\u00e9ratif."},
+  E:  {nom:"Exclamative",        court:"E",  regle:"On exprime un sentiment. Elle commence souvent par comme, que, quel, qu\u2019est-ce que."}
+};
+
+const PHRASES = [
+  ["Le vent est tr\u00e8s violent aujourd\u2019hui.","D"],
+  ["Ne joue pas avec la nourriture\u202f!","IM"],
+  ["Que les gens sont sympathiques\u202f!","E"],
+  ["Pourquoi devons-nous partir\u202f?","IN"],
+  ["Les moustiques nous ont piqu\u00e9s toute la nuit.","D"],
+  ["O\u00f9 as-tu trouv\u00e9 ces gobelets\u202f?","IN"],
+  ["Les cerfs nous ont visit\u00e9s.","D"],
+  ["Comme tu es exigeant\u202f!","E"],
+  ["Que veux-tu faire de cette vaisselle\u202f?","IN"],
+  ["Ne prends pas \u00e7a au s\u00e9rieux\u202f!","IM"],
+  ["Je d\u00e9teste les macarons.","D"],
+  ["Aimerais-tu encore du fromage\u202f?","IN"],
+  ["Essaie de mieux ranger ta chambre\u202f!","IM"],
+  ["Qu\u2019est-ce que tu peux \u00eatre lent\u202f!","E"],
+  ["Il doit revenir maintenant\u202f?","IN"],
+  ["Ce comportement me rend fou.","D"],
+  ["T\u2019es-tu inscrite au cours de judo\u202f?","IN"],
+  ["Reste positive\u202f!","IM"],
+  ["Quelle poisse tu as eue\u202f!","E"],
+  ["Salut, comment vas-tu\u202f?","IN"],
+  ["Je suis en pleine forme.","D"],
+  ["Tu viens au cin\u00e9ma avec moi cet apr\u00e8s-midi\u202f?","IN"],
+  ["Non, je vais chez le m\u00e9decin.","D"],
+  ["Annule tout de suite ce rendez-vous\u202f!","IM"],
+  ["Que c\u2019est tentant\u202f!","E"],
+  ["Comme tu as grandi cet \u00e9t\u00e9\u202f!","E"],
+  ["Ne nage pas si loin\u202f!","IM"],
+  ["Je n\u2019ai pas envie de plonger de si haut.","D"],
+  ["Qui est le meilleur nageur de ce groupe\u202f?","IN"],
+  ["Son cousin est moniteur de ski.","D"],
+  ["Va vite acheter des fleurs.","IM"],
+  ["Quelle chaleur il fait\u202f!","E"],
+  ["Mets ta chambre en ordre.","IM"],
+  ["Comme la mer est calme\u202f!","E"],
+  ["Ne te baigne pas tout de suite apr\u00e8s avoir mang\u00e9.","IM"],
+  ["Comme la glace est bien entretenue\u202f!","E"],
+  ["Patinez plus rapidement\u202f!","IM"],
+  ["Essaie de prendre le puck\u202f!","IM"],
+  ["Qu\u2019est-ce qu\u2019il a fait comme progr\u00e8s\u202f!","E"],
+  ["Venez tous les jours vous entra\u00eener\u202f!","IM"],
+  ["Comme tu as bien travaill\u00e9\u202f!","E"],
+  ["Que ce sport est difficile\u202f!","E"],
+  ["Comme ses patins sont bien aiguis\u00e9s\u202f!","E"],
+  ["Jouez mieux\u202f!","IM"],
+  ["Que ces adversaires sont redoutables\u202f!","E"],
+  ["N\u2019oubliez pas votre casque\u202f!","IM"],
+  ["Gagnons ce match\u202f!","IM"],
+  ["Que cette patinoire est petite\u202f!","E"],
+  ["Foncez\u202f!","IM"],
+  ["Laissez-vous glisser\u202f!","IM"],
+  ["Comme ils se donnent de la peine\u202f!","E"],
+  ["N\u2019h\u00e9sitez pas \u00e0 contourner la cage\u202f!","IM"],
+  ["Que de buts ont \u00e9t\u00e9 encaiss\u00e9s\u202f!","E"],
+  ["Ne criez pas tout de suite \u00ab\u202fvictoire\u202f\u00bb\u202f!","IM"],
+  ["Quel superbe travail vous avez fait\u202f!","E"],
+  ["Soyez plus attentifs\u202f!","IM"]
+];
+
+/* verbe à l'impératif : oui / non */
+const IMPERATIF = [
+  ["Joue pour t\u2019amuser.","oui"],
+  ["Apprends \u00e0 bien lancer.","oui"],
+  ["Entra\u00eene-toi le plus possible.","oui"],
+  ["Tu peux monter au panier plus souvent.","non"],
+  ["Si tu sais dribbler, alors tu dois le faire.","non"],
+  ["N\u2019aie pas peur du ballon.","oui"],
+  ["Cours le plus vite possible.","oui"],
+  ["Tu peux essayer de lancer aux trois points.","non"],
+  ["Ne laisse pas passer ta chance.","oui"],
+  ["Le contr\u00f4le du ballon s\u2019am\u00e9liore de mille et une fa\u00e7ons.","non"],
+  ["Durant le jeu, n\u2019oublie pas tes co\u00e9quipiers.","oui"],
+  ["Si tu es gaucher, tu dois apprendre \u00e0 shooter avec la main droite.","non"],
+  ["\u00c9coute toujours ton coach.","oui"],
+  ["Essaie de viser au mieux le panier.","oui"],
+  ["Tu peux essayer de sauter encore plus haut.","non"],
+  ["Lorsque tu gagnes, il te faut serrer la main de tes adversaires.","non"],
+  ["L\u2019arbitre est tr\u00e8s important.","non"],
+  ["Sois attentif sur le terrain.","oui"],
+  ["Tu peux toujours faire mieux\u202f!","non"],
+  ["Apr\u00e8s une d\u00e9faite, il peut y avoir une victoire.","non"]
+];
+
+/* positive / négative */
+const FORMES = [
+  ["Elle joue au tennis.","P"],
+  ["Elle ne joue pas au tennis.","N"],
+  ["Les enfants aiment ce sport.","P"],
+  ["Les enfants n\u2019aiment pas ce sport.","N"],
+  ["Mon fr\u00e8re parle allemand.","P"],
+  ["Je n\u2019ai pas envie de plonger de si haut.","N"],
+  ["Je ne mange jamais de l\u00e9gumes.","N"],
+  ["Je mange souvent des l\u00e9gumes.","P"],
+  ["Il n\u2019y a personne dans la salle.","N"],
+  ["J\u2019ai vu quelqu\u2019un dans la salle.","P"],
+  ["Nous n\u2019allons nulle part cet \u00e9t\u00e9.","N"],
+  ["Nous allons quelque part cet \u00e9t\u00e9.","P"],
+  ["J\u2019ai d\u00e9j\u00e0 termin\u00e9 mes devoirs.","P"],
+  ["Je n\u2019ai pas encore termin\u00e9 mes devoirs.","N"],
+  ["Elle ne veut ni th\u00e9 ni caf\u00e9.","N"],
+  ["Elle veut du th\u00e9 et du caf\u00e9.","P"],
+  ["Je ne trouve rien dans mon sac.","N"],
+  ["Ne joue pas avec la nourriture\u202f!","N"],
+  ["Reste tranquille.","P"],
+  ["Il n\u2019a aucun ami dans cette classe.","N"]
+];
+
+/* transformations — la première réponse est le modèle affiché */
+const TRANSFORME = [
+  {c:"Mets cette phrase \u00e0 la forme n\u00e9gative.", q:"Mon fr\u00e8re parle allemand.",
+   r:["Mon fr\u00e8re ne parle pas allemand."]},
+  {c:"Mets cette phrase \u00e0 la forme n\u00e9gative.", q:"Elle est belle, la vue.",
+   r:["Elle n\u2019est pas belle, la vue."]},
+  {c:"Mets cette phrase \u00e0 la forme n\u00e9gative.", q:"Je passe mon examen jeudi.",
+   r:["Je ne passe pas mon examen jeudi."]},
+  {c:"Mets cette phrase \u00e0 la forme n\u00e9gative.", q:"Je mange souvent des l\u00e9gumes.",
+   r:["Je ne mange jamais de l\u00e9gumes.","Je ne mange pas souvent de l\u00e9gumes.",
+      "Je ne mange pas souvent des l\u00e9gumes."]},
+  {c:"Mets cette phrase \u00e0 la forme n\u00e9gative.", q:"Mon amie, je la rencontre ce soir.",
+   r:["Mon amie, je ne la rencontre pas ce soir."]},
+  {c:"Mets cette phrase \u00e0 la forme n\u00e9gative.", q:"C\u2019est ce chanteur qui vient en concert demain.",
+   r:["Ce n\u2019est pas ce chanteur qui vient en concert demain."]},
+
+  {c:"Transforme en phrase imp\u00e9rative.", q:"Nous ne devons pas crier.", r:["Ne crions pas\u202f!"]},
+  {c:"Transforme en phrase imp\u00e9rative.", q:"Vous ne devez pas entrer.", r:["N\u2019entrez pas\u202f!"]},
+  {c:"Transforme en phrase imp\u00e9rative.", q:"Tu ne dois pas siffler.", r:["Ne siffle pas\u202f!"]},
+
+  {c:"Transforme en phrase exclamative.", q:"Il fait froid.",
+   r:["Qu\u2019il fait froid\u202f!","Comme il fait froid\u202f!"]},
+  {c:"Transforme en phrase exclamative.", q:"Ce gar\u00e7on est impoli.",
+   r:["Que ce gar\u00e7on est impoli\u202f!","Comme ce gar\u00e7on est impoli\u202f!"]},
+  {c:"Transforme en phrase exclamative.", q:"Ces g\u00e2teaux sont d\u00e9licieux.",
+   r:["Que ces g\u00e2teaux sont d\u00e9licieux\u202f!","Comme ces g\u00e2teaux sont d\u00e9licieux\u202f!"]},
+
+  {c:"Transforme en phrase d\u00e9clarative.", q:"Reste tranquille.",
+   r:["Tu dois rester tranquille.","Tu restes tranquille."]},
+  {c:"Transforme en phrase d\u00e9clarative.", q:"Enlevez vos chaussures.",
+   r:["Vous devez enlever vos chaussures.","Vous enlevez vos chaussures."]},
+  {c:"Transforme en phrase d\u00e9clarative.", q:"Pr\u00e9pare ton sac.",
+   r:["Tu dois pr\u00e9parer ton sac.","Tu pr\u00e9pares ton sac."]},
+
+  {c:"\u00c9cris la question qui va avec cette r\u00e9ponse.",
+   q:"Oui, je suis contente de voir mon ami.",
+   r:["Es-tu contente de voir ton ami\u202f?","Est-ce que tu es contente de voir ton ami\u202f?"]},
+  {c:"\u00c9cris la question qui va avec cette r\u00e9ponse.",
+   q:"Non, je ne me suis pas bagarr\u00e9 avec mon ami.",
+   r:["T\u2019es-tu bagarr\u00e9 avec ton ami\u202f?","Est-ce que tu t\u2019es bagarr\u00e9 avec ton ami\u202f?"]},
+  {c:"\u00c9cris la question qui va avec cette r\u00e9ponse.",
+   q:"Il veut venir parce qu\u2019il a des billets \u00e0 \u00e9changer.",
+   r:["Pourquoi veut-il venir\u202f?","Pourquoi est-ce qu\u2019il veut venir\u202f?"]}
+];
+
+/* ===================== outils ===================== */
+const $ = id => document.getElementById(id);
+const mem = {};
+const store = {
+  get(k){ try { return localStorage.getItem(k); } catch(e){ return mem[k] ?? null; } },
+  set(k,v){ try { localStorage.setItem(k,v); } catch(e){ mem[k] = v; } }
+};
+function shuffle(a){
+  for (let i = a.length-1; i > 0; i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+/* comparaison souple : accents, majuscules, ponctuation et espaces ignorés */
+function norm(s){
+  return s.toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[\u2019\u2018`]/g,"'")
+    .replace(/[^a-z0-9']+/g," ")
+    .replace(/\s*'\s*/g,"'")
+    .trim();
+}
+
+/* ===================== menu ===================== */
+const EXOS = [
+  {id:"theorie", badge:"?",  titre:"La th\u00e9orie",        sous:"Les 4 types et les 2 formes", couleur:"tD"},
+  {id:"types",   badge:"4",  titre:"Quel type de phrase\u202f?", sous:"D\u00e9clarative, interrogative, imp\u00e9rative, exclamative", couleur:"tIN"},
+  {id:"imp",     badge:"!",  titre:"Le verbe est-il \u00e0 l\u2019imp\u00e9ratif\u202f?", sous:"Oui ou non", couleur:"tIM"},
+  {id:"formes",  badge:"\u00b1", titre:"Positive ou n\u00e9gative\u202f?", sous:"La forme de la phrase", couleur:"tP"},
+  {id:"trans",   badge:"\u270e", titre:"Transformer",        sous:"\u00c0 \u00e9crire soi-m\u00eame", couleur:"tE"}
+];
+const menu = $("menu");
+EXOS.forEach(e => {
+  const li = document.createElement("li");
+  li.innerHTML = '<button class="item press ' + e.couleur + '">' +
+      '<span class="badge display"></span>' +
+      '<span class="txt"><b></b><small></small></span><span class="go">&#8250;</span></button>';
+  li.querySelector(".badge").textContent = e.badge;
+  li.querySelector("b").textContent = e.titre;
+  li.querySelector("small").textContent = e.sous;
+  li.querySelector("button").addEventListener("click", () => open(e.id));
+  menu.appendChild(li);
+});
+
+const homeEl = $("home"), theoryEl = $("theory"), quizEl = $("quiz");
+function screen(el){ [homeEl, theoryEl, quizEl].forEach(s => s.hidden = s !== el); window.scrollTo(0,0); }
+function goHome(){ $("party").hidden = true; screen(homeEl); }
+$("thBack").addEventListener("click", goHome);
+$("qBack").addEventListener("click", goHome);
+$("pHome").addEventListener("click", goHome);
+
+/* ===================== théorie ===================== */
+function buildTheory(){
+  const body = $("theoryBody");
+  if (body.childElementCount) return;
+  const blocs = [
+    ["tD","1. La phrase d\u00e9clarative",
+     ["On donne une information ou on raconte quelque chose.","Elle se termine par un point."],
+     "Je mange de la pizza quatre fromages."],
+    ["tIN","2. La phrase interrogative",
+     ["On pose une question.","Elle se termine par un point d\u2019interrogation.",
+      "Trois fa\u00e7ons de l\u2019\u00e9crire\u202f: inversion verbe-sujet, \u00ab\u202fest-ce que\u202f\u00bb, ou un mot interrogatif."],
+     "Veux-tu du chocolat\u202f? / Est-ce que tu veux du chocolat\u202f? / Combien de temps dure ce jeu\u202f?"],
+    ["tIM","3. La phrase imp\u00e9rative",
+     ["On donne un ordre ou un conseil.","Elle se termine par un point ou un point d\u2019exclamation.",
+      "Le verbe est \u00e0 l\u2019imp\u00e9ratif\u202f: il n\u2019a pas de sujet \u00e9crit."],
+     "Fais tes devoirs\u202f!"],
+    ["tE","4. La phrase exclamative",
+     ["On exprime un sentiment, une \u00e9motion ou un jugement.","Elle se termine par un point d\u2019exclamation.",
+      "Elle commence par un mot exclamatif\u202f: comme, que, quel, qu\u2019est-ce que\u2026"],
+     "Qu\u2019il fait beau dehors\u202f!"]
+  ];
+  blocs.forEach(([cls, titre, points, ex]) => {
+    const d = document.createElement("div");
+    d.className = "card " + cls;
+    d.innerHTML = "<h3></h3><ul>" + points.map(() => "<li></li>").join("") + "</ul><p class='ex'></p>";
+    d.querySelector("h3").textContent = titre;
+    d.querySelectorAll("li").forEach((li,i) => li.textContent = points[i]);
+    d.querySelector(".ex").textContent = ex;
+    body.appendChild(d);
+  });
+
+  const f = document.createElement("div");
+  f.className = "card tP";
+  f.innerHTML = "<h3>Les 2 formes</h3><ul>" +
+    "<li>Chaque phrase peut \u00eatre <b>positive</b> ou <b>n\u00e9gative</b>.</li>" +
+    "<li>Une phrase n\u00e9gative contient des mots de n\u00e9gation.</li></ul>" +
+    "<p class='ex'>J\u2019aime manger des pommes. / Je n\u2019aime pas manger des pommes.</p>";
+  body.appendChild(f);
+
+  const paires = [["ne\u2026 pas","/"],["ne\u2026 pas encore","d\u00e9j\u00e0, maintenant"],
+    ["ne\u2026 personne","quelqu\u2019un"],["ne\u2026 aucun","plusieurs, plein"],
+    ["ne\u2026 jamais","souvent, toujours"],["ne\u2026 nulle part","quelque part"],
+    ["ne\u2026 rien","tout, quelque chose"],["ne\u2026 ni\u2026 ni","et"]];
+  const t = document.createElement("div");
+  t.className = "card tN";
+  t.innerHTML = "<h3>N\u00e9gatif \u2192 positif</h3><table class='neg'><tbody>" +
+    paires.map(() => "<tr><td></td><td></td></tr>").join("") + "</tbody></table>";
+  t.querySelectorAll("tr").forEach((tr,i) => {
+    tr.children[0].textContent = paires[i][0];
+    tr.children[1].textContent = paires[i][1];
+  });
+  body.appendChild(t);
+}
+
+/* ===================== moteur d'exercice ===================== */
+let pile = [], total = 0, extras = 0, mode = null, answered = false, missed = null;
+
+const MODES = {
+  types: {
+    titre:"Quel type de phrase\u202f?",
+    items: () => PHRASES.map(([q,t]) => ({q, k:t})),
+    choices: ["D","IN","IM","E"].map(k => ({k, label:TYPES[k].nom, cls:"t"+k})),
+    why: k => TYPES[k].regle,
+    grid: ""
+  },
+  imp: {
+    titre:"Verbe \u00e0 l\u2019imp\u00e9ratif\u202f?",
+    items: () => IMPERATIF.map(([q,t]) => ({q, k:t})),
+    choices: [{k:"oui", label:"Oui, imp\u00e9ratif", cls:"tIM"},
+              {k:"non", label:"Non", cls:"tD"}],
+    why: k => k === "oui"
+      ? "Le verbe donne un ordre et n\u2019a pas de sujet \u00e9crit."
+      : "Il y a un sujet (tu, il\u2026)\u202f: le verbe n\u2019est pas \u00e0 l\u2019imp\u00e9ratif.",
+    grid: "two"
+  },
+  formes: {
+    titre:"Positive ou n\u00e9gative\u202f?",
+    items: () => FORMES.map(([q,t]) => ({q, k:t})),
+    choices: [{k:"P", label:"Positive", cls:"tP"}, {k:"N", label:"N\u00e9gative", cls:"tN"}],
+    why: k => k === "N"
+      ? "Elle contient des mots de n\u00e9gation (ne\u2026 pas, jamais, rien, personne\u2026)."
+      : "Elle ne contient aucun mot de n\u00e9gation.",
+    grid: "two"
+  },
+  trans: {
+    write: true,
+    titre:"Transformer",
+    items: () => TRANSFORME.map(t => ({q:t.q, consigne:t.c, r:t.r}))
+  }
+};
+
+function open(id){
+  if (id === "theorie"){ buildTheory(); screen(theoryEl); return; }
+  mode = MODES[id];
+  startPile();
+}
+function startPile(){
+  pile = shuffle(mode.items());
+  total = pile.length; extras = 0;
+  $("party").hidden = true;
+  screen(quizEl);
+  nextItem();
+}
+$("qAgain").addEventListener("click", startPile);
+$("pAgain").addEventListener("click", startPile);
+
+function nextItem(){
+  answered = false;
+  const stage = $("qStage");
+  stage.className = "stage";
+  $("qHint").className = "hintline";
+  $("qHint").innerHTML = "&nbsp;";
+  $("qModel").hidden = true;
+  $("qAfterRow").hidden = true;
+  $("qAccept").hidden = true;
+  missed = null;
+
+  const left = pile.length;
+  $("qLeft").textContent = left + (left > 1 ? " phrases" : " phrase");
+  $("qFill").style.width = (total ? (total-left)/total*100 : 0) + "%";
+  if (!left){
+    $("partyText").textContent = extras === 0
+      ? "Toutes les phrases justes du premier coup."
+      : "Tout est juste. Il a fallu " + extras + (extras > 1 ? " essais de plus." : " essai de plus.");
+    $("party").hidden = false;
+    return;
+  }
+  const it = pile[0];
+
+  if (mode.write){
+    $("qChoices").hidden = true;
+    $("qWriteRow").hidden = false;
+    $("qAnswer").hidden = false;
+    $("qAnswer").value = "";
+    $("qAnswer").readOnly = false;
+    $("qPhrase").innerHTML = "";
+    const c = document.createElement("small");
+    c.style.cssText = "display:block;font-size:13.5px;font-weight:700;color:var(--muted);" +
+                      "text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;";
+    c.textContent = it.consigne;
+    $("qPhrase").appendChild(c);
+    $("qPhrase").appendChild(document.createTextNode(it.q));
+  } else {
+    $("qChoices").hidden = false;
+    $("qWriteRow").hidden = true;
+    $("qAnswer").hidden = true;
+    $("qPhrase").textContent = it.q;
+    drawChoices();
+  }
+}
+
+function drawChoices(){
+  const box = $("qChoices");
+  box.className = "choices " + (mode.grid || "");
+  box.innerHTML = "";
+  mode.choices.forEach(c => {
+    const b = document.createElement("button");
+    b.className = "choice press " + c.cls;
+    b.dataset.k = c.k;
+    b.textContent = c.label;
+    b.addEventListener("click", () => pick(c.k));
+    box.appendChild(b);
+  });
+}
+
+function pick(k){
+  if (answered) return;
+  answered = true;
+  const it = pile[0], ok = k === it.k;
+  const btns = [...$("qChoices").children];
+  btns.forEach(b => {
+    if (b.dataset.k === it.k) b.classList.add("sol");
+    else if (b.dataset.k === k) b.classList.add("err");
+  });
+  resolve(ok, mode.why(it.k));
+}
+
+$("qCheck").addEventListener("click", () => {
+  if (answered) return;
+  const it = pile[0], given = $("qAnswer").value.trim();
+  if (!given) return;
+  answered = true;
+  const ok = it.r.some(r => norm(r) === norm(given));
+  $("qModel").hidden = false;
+  $("qModel").innerHTML = "<b>" + (it.r.length > 1 ? "R\u00e9ponses possibles" : "R\u00e9ponse") + "</b>";
+  $("qModel").appendChild(document.createTextNode(it.r.join("  \u00b7  ")));
+  if (!ok) $("qAccept").hidden = false;
+  $("qWriteRow").hidden = true;
+  $("qAnswer").readOnly = true;
+  resolve(ok, "");
+});
+
+function resolve(ok, why){
+  const stage = $("qStage");
+  if (ok){
+    stage.classList.add("right");
+    $("qHint").className = "hintline ok";
+    $("qHint").textContent = "Juste\u202f!";
+    pile.shift();
+  } else {
+    extras++;
+    stage.classList.add("wrong");
+    $("qHint").className = "hintline no";
+    $("qHint").textContent = why || "Pas tout \u00e0 fait.";
+    missed = pile.shift();
+    pile.splice(Math.min(pile.length, 2 + Math.floor(Math.random()*4)), 0, missed);
+  }
+  $("qAfterRow").hidden = false;
+  $("qNext").textContent = pile.length ? "Suivant" : "Voir le r\u00e9sultat";
+}
+
+/* « c'était juste aussi » : la phrase quitte la pile et l'erreur est effacée */
+$("qAccept").addEventListener("click", () => {
+  const idx = pile.indexOf(missed);
+  if (idx > -1) pile.splice(idx, 1);
+  missed = null;
+  extras = Math.max(0, extras - 1);
+  $("qHint").className = "hintline ok";
+  $("qHint").textContent = "D\u2019accord, compt\u00e9 juste.";
+  $("qStage").className = "stage right";
+  $("qAccept").hidden = true;
+  $("qNext").textContent = pile.length ? "Suivant" : "Voir le r\u00e9sultat";
+});
+
+$("qNext").addEventListener("click", nextItem);
+</script>
+</body>
+</html>
