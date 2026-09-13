@@ -11,7 +11,7 @@ iPhone home screen and it behaves like an app.
 
 Published with GitHub Pages from the repository root:
 
-    https://flc-lab-projects.github.io/Charly-7P/
+    https://flc-lab-projects.github.io/Revision/
 
 ## Adding vocabulary
 
