@@ -41,6 +41,6 @@ sits in the same block, in `TYPES` and in the `EXOS` menu list.
 
 Drop the `francais` folder into the repository root:
 
-    https://flc-lab-projects.github.io/Charly-7P/francais/
+    https://flc-lab-projects.github.io/Revision/francais/
 
 Open in Safari, then Share → Add to Home Screen.
