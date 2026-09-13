@@ -36,7 +36,7 @@ Note that Entraînement still offers all twelve livrets — only the test pool i
 
 ## Publishing
 
-Drop the `livrets` folder into the repository root:
+The `livrets` folder sits in the repository root:
 
     https://flc-lab-projects.github.io/Revision/livrets/
 

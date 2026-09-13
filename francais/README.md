@@ -39,7 +39,7 @@ sits in the same block, in `TYPES` and in the `EXOS` menu list.
 
 ## Publishing
 
-Drop the `francais` folder into the repository root:
+The `francais` folder sits in the repository root:
 
     https://flc-lab-projects.github.io/Revision/francais/
 
